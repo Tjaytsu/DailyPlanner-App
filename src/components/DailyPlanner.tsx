@@ -4,7 +4,7 @@ import { Check, Copy, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// 1. Define explicit TypeScript interface for time slots
+// Define explicit TypeScript interface for time slots
 interface TimeSlot {
   time: string;
   activity: string;
@@ -137,7 +137,6 @@ export function DailyPlanner() {
       setTimeSlots(DEFAULT_TIME_SLOTS);
       setPriorities(DEFAULT_PRIORITIES);
       setTodos(DEFAULT_TODOS);
-      setGoals(DEFAULT_GOALS);
       setDate(new Date().toISOString().split("T")[0]);
     }
   };
@@ -184,7 +183,7 @@ export function DailyPlanner() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-6">
+    <div className="max-w-6xl mx-auto p-2 sm:p-4 space-y-6">
       {/* Top Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-card p-4 rounded-xl border shadow-sm">
         <div className="flex items-center gap-3">
@@ -224,12 +223,12 @@ export function DailyPlanner() {
       {/* Capturable Canvas */}
       <div
         ref={plannerRef}
-        className="bg-background text-foreground border rounded-2xl p-6 sm:p-8 shadow-md grid grid-cols-1 md:grid-cols-12 gap-8"
+        className="bg-background text-foreground border rounded-2xl p-4 sm:p-8 shadow-md grid grid-cols-1 md:grid-cols-12 gap-8"
       >
         {/* Main Content Area */}
         <div className="md:col-span-7 lg:col-span-8 space-y-6">
           <div className="border-b pb-4">
-            <h1 className="text-3xl font-extrabold tracking-wider text-primary uppercase">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wider text-primary uppercase">
               Daily Planner
             </h1>
             <p className="text-xs tracking-widest text-muted-foreground uppercase font-semibold">
@@ -242,21 +241,22 @@ export function DailyPlanner() {
 
           {/* Time Schedule Table */}
           <div className="space-y-2">
-            <div className="grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b pb-2">
-              <span className="col-span-1 text-center">Done</span>
-              <span className="col-span-4 pl-2">Time</span>
-              <span className="col-span-7 pl-2">Activities</span>
+            {/* Adjusted Grid Columns for Mobile Layout */}
+            <div className="grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b pb-2 gap-1">
+              <span className="col-span-2 sm:col-span-1 text-center">Done</span>
+              <span className="col-span-4 sm:col-span-3 pl-1">Time</span>
+              <span className="col-span-6 sm:col-span-8 pl-2">Activities</span>
             </div>
 
             <div className="divide-y divide-border">
               {timeSlots.map((slot: TimeSlot, index: number) => (
                 <div
                   key={index}
-                  className={`grid grid-cols-12 items-center py-1.5 transition-colors rounded-md px-1 ${
+                  className={`grid grid-cols-12 items-center py-2 transition-colors rounded-md px-1 gap-1 ${
                     slot.completed ? "bg-muted/40" : "hover:bg-muted/20"
                   }`}
                 >
-                  <div className="col-span-1 flex justify-center">
+                  <div className="col-span-2 sm:col-span-1 flex justify-center">
                     <input
                       type="checkbox"
                       checked={slot.completed}
@@ -265,22 +265,23 @@ export function DailyPlanner() {
                     />
                   </div>
 
-                  <span className="col-span-4 pl-2 text-xs font-mono font-semibold text-muted-foreground">
+                  <span className="col-span-4 sm:col-span-3 text-[11px] sm:text-xs font-mono font-semibold text-muted-foreground whitespace-nowrap">
                     {slot.time}
                   </span>
 
-                  <div className="col-span-7 border-l pl-3">
-                    <Input
+                  <div className="col-span-6 sm:col-span-8 border-l pl-2">
+                    <textarea
+                      rows={1}
                       value={slot.activity}
                       onChange={(e) =>
                         handleActivityChange(index, e.target.value)
                       }
-                      className={`h-7 text-xs sm:text-sm border-none shadow-none focus-visible:ring-1 bg-transparent px-1 ${
+                      placeholder="Add activity..."
+                      className={`w-full text-xs sm:text-sm bg-transparent border-none outline-none focus:ring-0 resize-y min-h-[28px] overflow-y-auto px-1 leading-snug ${
                         slot.completed
                           ? "line-through text-muted-foreground font-normal"
-                          : "font-medium"
+                          : "font-medium text-foreground"
                       }`}
-                      placeholder="Add activity..."
                     />
                   </div>
                 </div>
@@ -290,7 +291,7 @@ export function DailyPlanner() {
         </div>
 
         {/* Sidebar */}
-        <div className="md:col-span-5 lg:col-span-4 space-y-6 border-l pl-0 md:pl-6">
+        <div className="md:col-span-5 lg:col-span-4 space-y-6 border-l-0 md:border-l pl-0 md:pl-6 pt-6 md:pt-0 border-t md:border-t-0">
           {/* Top Priorities */}
           <div className="bg-muted/30 p-4 rounded-xl border space-y-3">
             <h2 className="text-xs font-bold uppercase tracking-wider text-primary border-b pb-2">
@@ -300,17 +301,17 @@ export function DailyPlanner() {
               {priorities.map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-center justify-between group"
+                  className="flex items-center justify-between group gap-2"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span className="flex items-center gap-2 break-words">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     {item}
                   </span>
                   <button
                     onClick={() =>
                       setPriorities(priorities.filter((_, i) => i !== idx))
                     }
-                    className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity"
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-destructive transition-opacity shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -354,15 +355,15 @@ export function DailyPlanner() {
               {todos.map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-center justify-between group"
+                  className="flex items-center justify-between group gap-2"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+                  <span className="flex items-center gap-2 break-words">
+                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground shrink-0" />
                     {item}
                   </span>
                   <button
                     onClick={() => setTodos(todos.filter((_, i) => i !== idx))}
-                    className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity"
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-destructive transition-opacity shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -406,15 +407,15 @@ export function DailyPlanner() {
               {goals.map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-center justify-between group"
+                  className="flex items-center justify-between group gap-2"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="flex items-center gap-2 break-words">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
                     {item}
                   </span>
                   <button
                     onClick={() => setGoals(goals.filter((_, i) => i !== idx))}
-                    className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity"
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-destructive transition-opacity shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
