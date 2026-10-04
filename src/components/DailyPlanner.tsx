@@ -4,8 +4,15 @@ import { Check, Copy, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// Generic 24-Hour Schedule (05.00 AM to 04.00 AM) with clean dummy placeholders
-const DEFAULT_TIME_SLOTS = [
+// 1. Define explicit TypeScript interface for time slots
+interface TimeSlot {
+  time: string;
+  activity: string;
+  completed: boolean;
+}
+
+// Generic 24-Hour Schedule (05.00 AM to 04.00 AM)
+const DEFAULT_TIME_SLOTS: TimeSlot[] = [
   {
     time: "05.00 AM",
     activity: "Morning Routine & Meditation",
@@ -64,7 +71,7 @@ const DEFAULT_GOALS = [
 export function DailyPlanner() {
   const plannerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Initialize State from LocalStorage (or fall back to clean dummy defaults)
+  // Initialize State from LocalStorage
   const [date, setDate] = useState(() => {
     return (
       localStorage.getItem("rkl_planner_date") ||
@@ -72,7 +79,7 @@ export function DailyPlanner() {
     );
   });
 
-  const [timeSlots, setTimeSlots] = useState(() => {
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(() => {
     const saved = localStorage.getItem("rkl_planner_timeSlots");
     return saved ? JSON.parse(saved) : DEFAULT_TIME_SLOTS;
   });
@@ -97,7 +104,7 @@ export function DailyPlanner() {
   const [newTodo, setNewTodo] = useState("");
   const [newGoal, setNewGoal] = useState("");
 
-  // 2. Automatically save state updates to LocalStorage whenever anything changes
+  // Auto-save state updates to LocalStorage
   useEffect(() => {
     localStorage.setItem("rkl_planner_date", date);
     localStorage.setItem("rkl_planner_timeSlots", JSON.stringify(timeSlots));
@@ -120,7 +127,7 @@ export function DailyPlanner() {
     setTimeSlots(updated);
   };
 
-  // Reset day back to fresh dummy template
+  // Reset day back to default template
   const handleResetDay = () => {
     if (
       window.confirm(
@@ -158,7 +165,7 @@ export function DailyPlanner() {
     priorities.forEach((p) => (summary += `• ${p}\n`));
 
     summary += `\n⏰ *HOURLY SCHEDULE:*\n`;
-    timeSlots.forEach((slot) => {
+    timeSlots.forEach((slot: TimeSlot) => {
       if (slot.activity.trim()) {
         const check = slot.completed ? "✅" : "⏳";
         summary += `${check} *${slot.time}*: ${slot.activity}\n`;
@@ -242,48 +249,42 @@ export function DailyPlanner() {
             </div>
 
             <div className="divide-y divide-border">
-              {timeSlots.map(
-                (
-                  slot: { time: string; activity: string; completed: boolean },
-                  index: number,
-                ) => (
-                  <div
-                    key={index}
-                    className={`grid grid-cols-12 items-center py-1.5 transition-colors rounded-md px-1 ${
-                      slot.completed ? "bg-muted/40" : "hover:bg-muted/20"
-                    }`}
-                  >
-                    <div className="col-span-1 flex justify-center">
-                      <input
-                        type="checkbox"
-                        checked={slot.completed}
-                        onChange={() => toggleActivityComplete(index)}
-                        className="h-4 w-4 rounded border-muted-foreground text-primary focus:ring-primary cursor-pointer"
-                      />
-                    </div>
-
-                    <span className="col-span-4 pl-2 text-xs font-mono font-semibold text-muted-foreground">
-                      {slot.time}
-                    </span>
-
-                    <div className="col-span-7 border-l pl-3">
-                      <Input
-                        variant="ghost"
-                        value={slot.activity}
-                        onChange={(e) =>
-                          handleActivityChange(index, e.target.value)
-                        }
-                        className={`h-7 text-xs sm:text-sm border-none focus-visible:ring-1 bg-transparent px-1 ${
-                          slot.completed
-                            ? "line-through text-muted-foreground font-normal"
-                            : "font-medium"
-                        }`}
-                        placeholder="Add activity..."
-                      />
-                    </div>
+              {timeSlots.map((slot: TimeSlot, index: number) => (
+                <div
+                  key={index}
+                  className={`grid grid-cols-12 items-center py-1.5 transition-colors rounded-md px-1 ${
+                    slot.completed ? "bg-muted/40" : "hover:bg-muted/20"
+                  }`}
+                >
+                  <div className="col-span-1 flex justify-center">
+                    <input
+                      type="checkbox"
+                      checked={slot.completed}
+                      onChange={() => toggleActivityComplete(index)}
+                      className="h-4 w-4 rounded border-muted-foreground text-primary focus:ring-primary cursor-pointer"
+                    />
                   </div>
-                ),
-              )}
+
+                  <span className="col-span-4 pl-2 text-xs font-mono font-semibold text-muted-foreground">
+                    {slot.time}
+                  </span>
+
+                  <div className="col-span-7 border-l pl-3">
+                    <Input
+                      value={slot.activity}
+                      onChange={(e) =>
+                        handleActivityChange(index, e.target.value)
+                      }
+                      className={`h-7 text-xs sm:text-sm border-none shadow-none focus-visible:ring-1 bg-transparent px-1 ${
+                        slot.completed
+                          ? "line-through text-muted-foreground font-normal"
+                          : "font-medium"
+                      }`}
+                      placeholder="Add activity..."
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
